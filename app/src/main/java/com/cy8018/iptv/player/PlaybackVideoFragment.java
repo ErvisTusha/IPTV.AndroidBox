@@ -23,13 +23,20 @@ import android.util.Log;
 import androidx.leanback.media.PlaybackGlue;
 
 import com.cy8018.iptv.database.AppDatabase;
+import com.cy8018.iptv.database.ScheduleData;
 import com.cy8018.iptv.database.StationData;
+import com.cy8018.iptv.model.ScheduleDisplayInfo;
 import com.cy8018.iptv.model.Station;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.WeakReference;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Handles video playback with media controls.
@@ -40,6 +47,8 @@ public class PlaybackVideoFragment extends MyVideoSupportFragment {
     final MyVideoSupportFragmentGlueHost mHost = new MyVideoSupportFragmentGlueHost(this);
     private Station currentStation = null;
     private ArrayList<Station> mStationList;
+    private List<ScheduleData> mScheduleDataList;
+
     private int currentSourceIndex = 0;
 
     private String targetChannelId = "";
@@ -90,6 +99,10 @@ public class PlaybackVideoFragment extends MyVideoSupportFragment {
         int sourceIndex = 0;
         StationData stationData = AppDatabase.getInstance(getActivity()).stationDao().findByName(currentStation.name);
 
+//        mScheduleDataList = AppDatabase.getInstance(getActivity()).scheduleDao().getAllByChannelCodeToday(currentStation.code);
+
+        mScheduleDataList = AppDatabase.getInstance(getActivity()).scheduleDao().getAll();
+
         if (stationData!= null && stationData.lastSource > 0) {
             sourceIndex = stationData.lastSource;
         }
@@ -99,6 +112,9 @@ public class PlaybackVideoFragment extends MyVideoSupportFragment {
         mMediaPlayerGlue.getPlayerAdapter().setDataSource(Uri.parse(currentStation.url.get(sourceIndex)));
 
         mMediaPlayerGlue.setCurrentStation(currentStation);
+
+        mMediaPlayerGlue.setScheduleInfo(getScheduleDisplayInfo());
+
         mMediaPlayerGlue.playWhenPrepared();
 
         SetLastActiveTime();
@@ -110,6 +126,61 @@ public class PlaybackVideoFragment extends MyVideoSupportFragment {
     public void onStop() {
         isCheckerRunning = false;
         super.onStop();
+    }
+
+    private ScheduleDisplayInfo getScheduleDisplayInfo()
+    {
+        ScheduleDisplayInfo scheduleDisplayInfo = new ScheduleDisplayInfo();
+
+        Date nowTime = new Date();
+        int index = 0;
+        for (ScheduleData scheduleData : mScheduleDataList)
+        {
+            index++;
+            if (isTimeInBetween(nowTime, scheduleData.startTime, scheduleData.endTime))
+            {
+                Format formatter = new SimpleDateFormat("HH:mm");
+
+                scheduleDisplayInfo.currentProgramTime = formatter.format(scheduleData.startTime);
+                scheduleDisplayInfo.currentProgramName = scheduleData.programName;
+
+                if (index >= mScheduleDataList.size())
+                {
+                    scheduleDisplayInfo.nextProgramName = "";
+                    scheduleDisplayInfo.nextProgramTime = "";
+                }
+                else
+                {
+                    ScheduleData nextScheduleData  = mScheduleDataList.get(index);
+                    scheduleDisplayInfo.nextProgramTime = formatter.format(nextScheduleData.startTime);
+                    scheduleDisplayInfo.nextProgramName = nextScheduleData.programName;
+                }
+                break;
+            }
+        }
+        return scheduleDisplayInfo;
+    }
+
+    private boolean isTimeInBetween(Date nowTime, Date startTime, Date endTime) {
+        if (nowTime.getTime() == startTime.getTime()
+                || nowTime.getTime() == endTime.getTime()) {
+            return true;
+        }
+
+        Calendar date = Calendar.getInstance();
+        date.setTime(nowTime);
+
+        Calendar begin = Calendar.getInstance();
+        begin.setTime(startTime);
+
+        Calendar end = Calendar.getInstance();
+        end.setTime(endTime);
+
+        if (date.after(begin) && date.before(end)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     static void playWhenReady(VideoMediaPlayerGlue glue) {
@@ -162,6 +233,9 @@ public class PlaybackVideoFragment extends MyVideoSupportFragment {
 
         mMediaPlayerGlue.setCurrentStation(currentStation);
 
+        mScheduleDataList = AppDatabase.getInstance(getActivity()).scheduleDao().getAllByChannelCodeToday(currentStation.code);
+        mMediaPlayerGlue.setScheduleInfo(getScheduleDisplayInfo());
+
         Log.d(TAG, "SwitchChanel: "+ currentStation.name);
 
         playWhenReady(mMediaPlayerGlue);
@@ -193,6 +267,8 @@ public class PlaybackVideoFragment extends MyVideoSupportFragment {
         mMediaPlayerGlue.getPlayerAdapter().setDataSource(Uri.parse(currentStation.url.get(currentSourceIndex)));
 
         mMediaPlayerGlue.setCurrentStation(currentStation);
+        mScheduleDataList = AppDatabase.getInstance(getActivity()).scheduleDao().getAllByChannelCodeToday(currentStation.code);
+        mMediaPlayerGlue.setScheduleInfo(getScheduleDisplayInfo());
 
         Log.d(TAG, "SwitchChanelById: "+ currentStation.name);
 
@@ -288,11 +364,14 @@ public class PlaybackVideoFragment extends MyVideoSupportFragment {
             PlaybackVideoFragment playbackVideoFragment = mPlaybackVideoFragment.get();
 
             if (msg.what == MSG_SHOW_CONTROL) {
-                playbackVideoFragment.showControlsOverlay(true);
+                if (!playbackVideoFragment.isControlsOverlayVisible())
+                {
+                    playbackVideoFragment.showControlsOverlay(true);
+                }
             }
             else if (msg.what == MSG_HIDE_CONTROL) {
                 if (playbackVideoFragment.isControlsOverlayVisible() && playbackVideoFragment.mMediaPlayerGlue.isPlaying()) {
-                    playbackVideoFragment.hideControlsOverlay(true);
+                    playbackVideoFragment.hideControlsOverlay(false);
                 }
             }
             else if (msg.what == MSG_SWITCH_CHANNEL) {

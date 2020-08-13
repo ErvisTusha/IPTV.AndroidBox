@@ -30,12 +30,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.cy8018.iptv.R;
+import com.cy8018.iptv.model.ScheduleDisplayInfo;
 import com.cy8018.iptv.model.Station;
 
 import org.jetbrains.annotations.NotNull;
@@ -55,6 +57,11 @@ public class VideoMediaPlayerGlue<T extends PlayerAdapter> extends PlaybackTrans
 
     private String currentTime = "";
 
+    private String currentProgramName = "";
+    private String currentProgramTime = "";
+
+    private ScheduleDisplayInfo scheduleDisplayInfo;
+
     private String currentChannelId = "";
 
     private String targetChannelId = "";
@@ -73,6 +80,10 @@ public class VideoMediaPlayerGlue<T extends PlayerAdapter> extends PlaybackTrans
 
     public void setCurrentTime (String time) { this.currentTime = time; }
 
+    public ScheduleDisplayInfo getScheduleDisplayInfo() {
+        return scheduleDisplayInfo;
+    }
+
     public void setCurrentChannelId(String currentChannelId)
     {
         this.currentChannelId = currentChannelId;
@@ -89,6 +100,10 @@ public class VideoMediaPlayerGlue<T extends PlayerAdapter> extends PlaybackTrans
 
     public String getTargetChannelId() {
         return targetChannelId;
+    }
+
+    public void setScheduleInfo(ScheduleDisplayInfo scheduleDisplayInfo) {
+        this.scheduleDisplayInfo = scheduleDisplayInfo;
     }
 
     public void setCurrentStation(Station currentStation) {
@@ -184,17 +199,21 @@ public class VideoMediaPlayerGlue<T extends PlayerAdapter> extends PlaybackTrans
 
             VideoMediaPlayerGlue glue = (VideoMediaPlayerGlue) item;
             String channelNameString = glue.getTitle().toString();
-            ((ViewHolder)viewHolder).channelName.setText(channelNameString);
-            if ((channelNameString.length() > 4 && isContainChinese(channelNameString))
-                || channelNameString.length() > 10
-            )
+            if (channelNameString != ((ViewHolder)viewHolder).channelName.getText())
             {
-                ((ViewHolder)viewHolder).channelName.setTextSize(60);
+                ((ViewHolder)viewHolder).channelName.setText(channelNameString);
             }
-            else
-            {
-                ((ViewHolder)viewHolder).channelName.setTextSize(78);
-            }
+
+//            if ((channelNameString.length() > 4 && isContainChinese(channelNameString))
+//                || channelNameString.length() > 10
+//            )
+//            {
+//                ((ViewHolder)viewHolder).channelName.setTextSize(60);
+//            }
+//            else
+//            {
+//                ((ViewHolder)viewHolder).channelName.setTextSize(78);
+//            }
 
             ((ViewHolder)viewHolder).sourceInfo.setText(glue.getSubtitle());
             ((ViewHolder)viewHolder).currentTime.setText(currentTime);
@@ -221,6 +240,11 @@ public class VideoMediaPlayerGlue<T extends PlayerAdapter> extends PlaybackTrans
             TextView channelName;
             TextView sourceInfo;
             TextView networkSpeed;
+            TextView currentProgramName;
+            TextView currentProgramTime;
+            TextView nextProgramName;
+            TextView nextProgramTime;
+            LinearLayout scheduleInfoBar;
             ImageView logo;
 
             private ViewHolder (View itemView)
@@ -232,7 +256,17 @@ public class VideoMediaPlayerGlue<T extends PlayerAdapter> extends PlaybackTrans
                 channelName = itemView.findViewById(R.id.channel_name);
                 sourceInfo = itemView.findViewById(R.id.source_info);
                 networkSpeed = itemView.findViewById(R.id.network_speed);
+                currentProgramName = itemView.findViewById(R.id.current_program_name);
+                currentProgramTime = itemView.findViewById(R.id.current_program_time);
+                nextProgramName = itemView.findViewById(R.id.next_program_name);
+                nextProgramTime = itemView.findViewById(R.id.next_program_time);
+                scheduleInfoBar = itemView.findViewById(R.id.schedule_info);
+
                 logo = itemView.findViewById(R.id.channel_logo);
+
+                currentProgramName.setSelected(true);
+                nextProgramName.setSelected(true);
+                channelName.setSelected(true);
 
                 new Thread(updateInfoRunnable).start();
             }
@@ -241,6 +275,41 @@ public class VideoMediaPlayerGlue<T extends PlayerAdapter> extends PlaybackTrans
                 networkSpeed.setText(gNetworkSpeed);
                 currentTime.setText(getCurrentTimeString());
                 targetChannelId.setText(getTargetChannelId());
+                if (currentProgramName.getText() != getScheduleDisplayInfo().currentProgramName)
+                {
+                    currentProgramName.setText(getScheduleDisplayInfo().currentProgramName);
+                }
+                if (currentProgramTime.getText() != getScheduleDisplayInfo().currentProgramTime)
+                {
+                    currentProgramTime.setText(getScheduleDisplayInfo().currentProgramTime);
+                }
+                if (nextProgramName.getText() != getScheduleDisplayInfo().nextProgramName)
+                {
+                    nextProgramName.setText(getScheduleDisplayInfo().nextProgramName);
+                }
+                if (nextProgramTime.getText() != getScheduleDisplayInfo().nextProgramTime)
+                {
+                    nextProgramTime.setText(getScheduleDisplayInfo().nextProgramTime);
+                }
+
+                if (getScheduleDisplayInfo() == null
+                        || getScheduleDisplayInfo().currentProgramName == null
+                        || getScheduleDisplayInfo().currentProgramName.length() == 0)
+                {
+                    ViewGroup.LayoutParams layoutParams = scheduleInfoBar.getLayoutParams();
+                    layoutParams.height = 0;
+                    layoutParams.width = 0;
+                    scheduleInfoBar.setLayoutParams(layoutParams);
+                    scheduleInfoBar.setVisibility(View.INVISIBLE);
+                }
+                else
+                {
+                    ViewGroup.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT);;
+                    scheduleInfoBar.setLayoutParams(layoutParams);
+                    scheduleInfoBar.setVisibility(View.VISIBLE);
+                }
+
             }
 
             public final MsgHandler mHandler = new MsgHandler(this);

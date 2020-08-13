@@ -1,6 +1,20 @@
 <resources>
-    <string name="app_name">IPTV</string>
-    <string name="channel_list_title">TV Channels</string>
-    <string name="station_list_url">https://gitee.com/cy8018/Resources/raw/master/tv/tv_station_list_ext.json</string>
+    <string name="app_name">电视直播</string>
+    <string name="channel_list_title">频道列表</string>
+    <string name="current_program">当前节目: </string>
+    <string name="next_program"></string>
+
+<!--    <string name="app_name">IPTV</string>-->
+<!--    <string name="channel_list_title">Channels</string>-->
+<!--    <string name="current_program">Playing: </string>-->
+<!--    <string name="next_program">Next: </string>-->
+<!--    <string name="station_list_url">https://gitee.com/cy8018/Resources/raw/master/tv/tv_station_list_ext.json</string>-->
+
+    <string name="source_string"></string>
+    <string name="station_list_url">https://gitee.com/cy8018/Resources/raw/master/tv/tv_station_list_ext_cn.json</string>
     <string name="logo_url">https://gitee.com/cy8018/Resources/raw/master/tv/logo/</string>
+    <string name="schedule_url">http://api.avatardata.cn/TVTime/TVlist?key=d32de78fce15424b8848b493cac22fca</string>
+    <string name="schedule_para_channel">&amp;code=</string>
+    <string name="schedule_para_date">&amp;date=</string>
+
 </resources>

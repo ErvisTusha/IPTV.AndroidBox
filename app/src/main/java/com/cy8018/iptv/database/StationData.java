@@ -9,6 +9,8 @@ public class StationData {
     @PrimaryKey(autoGenerate = true)
     public int id;
 
+    @ColumnInfo(name = "channel_code")
+    public String channelCode;
 
     @ColumnInfo(name = "station_name")
     public String stationName;
