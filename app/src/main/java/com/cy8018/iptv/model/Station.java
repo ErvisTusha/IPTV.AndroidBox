@@ -10,14 +10,14 @@ import java.util.List;
 public class Station implements Parcelable {
 
     @SerializedName("name") public String name;
-    @SerializedName("code") public String code;
+    @SerializedName("id") public String id;
     @SerializedName("logo") public String logo;
     @SerializedName("url") public List<String> url;
     public int index;
 
     protected Station(Parcel in) {
         name = in.readString();
-        code = in.readString();
+        id = in.readString();
         logo = in.readString();
         url = in.createStringArrayList();
         index = in.readInt();
@@ -43,7 +43,7 @@ public class Station implements Parcelable {
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(name);
-        parcel.writeString(code);
+        parcel.writeString(id);
         parcel.writeString(logo);
         parcel.writeStringList(url);
         parcel.writeInt(index);

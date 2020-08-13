@@ -32,7 +32,6 @@ import androidx.leanback.widget.PresenterSelector;
 import androidx.leanback.widget.Row;
 import androidx.leanback.widget.RowPresenter;
 import androidx.leanback.widget.VerticalGridPresenter;
-import androidx.room.Room;
 
 import android.util.Log;
 import android.widget.Toast;
@@ -41,14 +40,17 @@ import com.cy8018.iptv.R;
 import com.cy8018.iptv.database.AppDatabase;
 import com.cy8018.iptv.database.ScheduleData;
 import com.cy8018.iptv.model.CardPresenterSelector;
-import com.cy8018.iptv.model.Schedule;
 import com.cy8018.iptv.model.Station;
 import com.cy8018.iptv.model.StationCardPresenter;
 import com.cy8018.iptv.player.PlaybackActivity;
+import com.cy8018.iptv.util.ScheduleInfoParser;
 import com.google.gson.Gson;
+
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -59,9 +61,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -79,7 +81,6 @@ public class TvChannelsFragment extends VerticalGridSupportFragment implements
     private static final int ZOOM_FACTOR = FocusHighlight.ZOOM_FACTOR_MEDIUM;
     private static final String TAG = "TvChannelsFragment";
     private static final String TAG_CATEGORY = "stations";
-    private static final String TAG_CATEGORY_SCHEDULE = "result";
     // Hashmap mapping category names to the list of videos in that category. This is fetched from
     // the url
     private Map<String, Station> categoryVideosMap = new HashMap<>();
@@ -117,31 +118,24 @@ public class TvChannelsFragment extends VerticalGridSupportFragment implements
 
     private void doGetSchedule() {
 
-        //AppDatabase.getInstance(getActivity()).scheduleDao().removeOldData();
+        //AppDatabase.getInstance(getActivity()).scheduleDao().removeAll();
 
-        if (AppDatabase.getInstance(getActivity()).scheduleDao().getAll().size() > 0)
+        if (AppDatabase.getInstance(getActivity()).scheduleDao().getAllTomorrow().size() > 0)
         {
-            Log.d(TAG, "doGetSchedule: "+ "Schedule list previously cached, skip downloading this time.");
+            Log.d(TAG, "Schedule list previously cached, skip downloading this time.");
             return;
         }
-
-        String urlToFetch = getResources().getString(R.string.schedule_url) + getResources().getString(R.string.schedule_para_channel);
-
-        for(Station station : mStationList) {
-            if (station.code != null
-                    && station.code.length() > 0
-                    && AppDatabase.getInstance(getActivity()).scheduleDao().getAllByChannelCodeToday(station.code).size() == 0)
-            {
-                String url = urlToFetch + station.code;
-                Log.d(TAG, "doGetSchedule: "+ "Request schedule list for channel: " + station.name + " (" + station.code+") URL: " + url);
-                fetchScheduleInfo(url, station.code);
-            }
+        else
+        {
+            AppDatabase.getInstance(getActivity()).scheduleDao().removeAll();
         }
+
+        new DownloadXmlTask().execute(getResources().getString(R.string.schedule_url));
     }
 
     private void createRows() {
         String urlToFetch = getResources().getString(R.string.station_list_url);
-        fetchVideosInfo(urlToFetch);
+        fetchChannelInfo(urlToFetch);
     }
 
     /**
@@ -149,7 +143,7 @@ public class TvChannelsFragment extends VerticalGridSupportFragment implements
      * in the form of a JSON object.
      * @param jsonObj The json object containing the information about all the videos.
      */
-    private void onFetchVideosInfoSuccess(JSONObject jsonObj) {
+    private void onFetchChannelInfoSuccess(JSONObject jsonObj) {
         try {
             String videoRowsJson = jsonObj.getString(TAG_CATEGORY);
             Station[] stationList = new Gson().fromJson(videoRowsJson, Station[].class);
@@ -166,15 +160,15 @@ public class TvChannelsFragment extends VerticalGridSupportFragment implements
             }
 
             getSchedule();
-            Log.d(TAG, "onFetchVideosInfoSuccess: list count:" + index);
+            Log.d(TAG, "onFetchChannelInfoSuccess: list count:" + index);
         } catch (JSONException ex) {
-            Log.e(TAG, "A JSON error occurred while fetching videos: " + ex.toString());
+            Log.e(TAG, "A JSON error occurred while fetching channel: " + ex.toString());
         }
     }
 
     private Date getDate(String value)
     {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
         try {
             Date date = simpleDateFormat.parse(value);
             return date;
@@ -185,50 +179,12 @@ public class TvChannelsFragment extends VerticalGridSupportFragment implements
         }
     }
 
-    private void onFetchScheduleInfoSuccess(JSONObject jsonObj, String channelCode) {
-        try {
-            String json = jsonObj.getString(TAG_CATEGORY_SCHEDULE);
-            Schedule[] scheduleList = new Gson().fromJson(json, Schedule[].class);
-            int index = 0;
-            if (scheduleList == null)
-            {
-                return;
-            }
-            for(Schedule schedule : scheduleList) {
-                ScheduleData scheduleData = new ScheduleData();
-                scheduleData.index = index++;
-                scheduleData.channelCode = channelCode;
-                scheduleData.programName = schedule.pName;
-
-
-                scheduleData.startTime = getDate(schedule.time);
-
-                if (index >= scheduleList.length)
-                {
-                    Calendar cal = Calendar.getInstance();
-                    cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 23, 59, 59);
-                    Date endOfDay = cal.getTime();
-                    scheduleData.endTime = endOfDay;
-                }
-                else
-                {
-                    scheduleData.endTime = getDate(scheduleList[index].time);
-                }
-
-                AppDatabase.getInstance(getActivity()).scheduleDao().insert(scheduleData);
-            }
-            Log.d(TAG, "onFetchScheduleInfoSuccess: list count:" + index);
-        } catch (JSONException ex) {
-            Log.e(TAG, "A JSON error occurred while fetching Schedules: " + ex.toString());
-        }
-    }
-
     /**
      * Called when an exception occurred while fetching videos meta data from the url.
      * @param ex The exception occurred in the asynchronous task fetching videos.
      */
     @RequiresApi(api = Build.VERSION_CODES.M)
-    private void onFetchVideosInfoError(Exception ex) {
+    private void onFetchChannelInfoError(Exception ex) {
         Log.e(TAG, "Error fetching videos. Exception: " + ex.toString());
         Toast.makeText(getContext(), "Error fetching videos from json file",
                 Toast.LENGTH_LONG).show();
@@ -255,73 +211,22 @@ public class TvChannelsFragment extends VerticalGridSupportFragment implements
         }
     }
 
-    private void fetchScheduleInfo(final String urlString, String channelCode) {
-
-        new AsyncTask<Void, Void, FetchResult>() {
-            @RequiresApi(api = Build.VERSION_CODES.M)
-            @Override
-            protected void onPostExecute(FetchResult fetchResult) {
-                if (fetchResult.isSuccess) {
-                    onFetchScheduleInfoSuccess(fetchResult.jsonObj, channelCode);
-                } else {
-                    onFetchVideosInfoError(fetchResult.exception);
-                }
-            }
-
-            @Override
-            protected FetchResult doInBackground(Void... params) {
-                BufferedReader reader = null;
-                HttpURLConnection urlConnection = null;
-                try {
-                    URL url = new URL(urlString);
-                    urlConnection = (HttpURLConnection) url.openConnection();
-                    reader = new BufferedReader(
-                            new InputStreamReader(urlConnection.getInputStream(),
-                                    StandardCharsets.UTF_8));
-                    StringBuilder sb = new StringBuilder();
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        sb.append(line);
-                    }
-                    return new FetchResult(new JSONObject(sb.toString()));
-                } catch (JSONException ex) {
-                    Log.e(TAG, "A JSON error occurred while fetching videos: " + ex.toString());
-                    return new FetchResult(ex);
-                } catch (IOException ex) {
-                    Log.e(TAG, "An I/O error occurred while fetching videos: " + ex.toString());
-                    return new FetchResult(ex);
-                } finally {
-                    if (urlConnection != null) {
-                        urlConnection.disconnect();
-                    }
-                    if (reader != null) {
-                        try {
-                            reader.close();
-                        } catch (IOException ex) {
-                            Log.e(TAG, "JSON reader could not be closed! " + ex);
-                        }
-                    }
-                }
-            }
-        }.execute();
-    }
-
     /**
      * Fetches videos metadata from urlString on a background thread. Callback methods are invoked
      * upon success or failure of this fetching.
      * @param urlString The json file url to fetch from
      */
     @SuppressLint("StaticFieldLeak")
-    private void fetchVideosInfo(final String urlString) {
+    private void fetchChannelInfo(final String urlString) {
 
         new AsyncTask<Void, Void, FetchResult>() {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             protected void onPostExecute(FetchResult fetchResult) {
                 if (fetchResult.isSuccess) {
-                    onFetchVideosInfoSuccess(fetchResult.jsonObj);
+                    onFetchChannelInfoSuccess(fetchResult.jsonObj);
                 } else {
-                    onFetchVideosInfoError(fetchResult.exception);
+                    onFetchChannelInfoError(fetchResult.exception);
                 }
             }
 
@@ -380,7 +285,79 @@ public class TvChannelsFragment extends VerticalGridSupportFragment implements
 
     @Override
     public void onItemSelected(Presenter.ViewHolder itemViewHolder, Object item,
-                               RowPresenter.ViewHolder rowViewHolder, Row row) {
+                               RowPresenter.ViewHolder rowViewHolder, Row row) { }
 
+    // Implementation of AsyncTask used to download XML feed from Internet.
+    private class DownloadXmlTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... urls) {
+            try {
+                return loadXmlFromNetwork(urls[0]);
+            } catch (IOException e) {
+                return "IOException";
+            } catch (XmlPullParserException e) {
+                return "XmlPullParserException";
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result) { }
+    }
+
+    // Loads XML from Internet, parses it
+    private String loadXmlFromNetwork(String urlString) throws XmlPullParserException, IOException {
+        InputStream stream = null;
+        // Instantiate the parser
+        ScheduleInfoParser scheduleInfoParser = new ScheduleInfoParser();
+        List<ScheduleInfoParser.Program> entries = null;
+        try {
+            stream = downloadUrl(urlString);
+            entries = scheduleInfoParser.parse(stream);
+            // Makes sure that the InputStream is closed after the app is
+            // finished using it.
+        } finally {
+            if (stream != null) {
+                stream.close();
+            }
+        }
+
+        List<String> channelIds = new ArrayList<String>();
+
+        for (Station station : mStationList) {
+            channelIds.add(station.id);
+        }
+
+        for (ScheduleInfoParser.Program entry : entries) {
+
+            Log.d(TAG, "Program entry: " + entry.channelId + " " + entry.title + " " + entry.startTime + " " + entry.endTime);
+
+            if (channelIds.contains(entry.channelId))
+            {
+                ScheduleData schedule = new ScheduleData();
+                schedule.channelId = entry.channelId;
+                schedule.programName = entry.title;
+                schedule.startTime = getDate(entry.startTime);
+                schedule.endTime = getDate(entry.endTime);
+
+                AppDatabase.getInstance(getActivity()).scheduleDao().insert(schedule);
+            }
+
+
+
+        }
+        return "";
+    }
+
+    // Given a string representation of a URL, sets up a connection and gets an input stream.
+    private InputStream downloadUrl(String urlString) throws IOException {
+        URL url = new URL(urlString);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setReadTimeout(10000 /* milliseconds */);
+        conn.setConnectTimeout(15000 /* milliseconds */);
+        conn.setRequestMethod("GET");
+        conn.setDoInput(true);
+        // Starts the query
+        conn.connect();
+        return conn.getInputStream();
     }
 }

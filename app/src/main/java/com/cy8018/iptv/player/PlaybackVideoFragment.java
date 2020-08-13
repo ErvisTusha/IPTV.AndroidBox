@@ -99,9 +99,8 @@ public class PlaybackVideoFragment extends MyVideoSupportFragment {
         int sourceIndex = 0;
         StationData stationData = AppDatabase.getInstance(getActivity()).stationDao().findByName(currentStation.name);
 
-//        mScheduleDataList = AppDatabase.getInstance(getActivity()).scheduleDao().getAllByChannelCodeToday(currentStation.code);
-
-        mScheduleDataList = AppDatabase.getInstance(getActivity()).scheduleDao().getAll();
+        //mScheduleDataList = AppDatabase.getInstance(getActivity()).scheduleDao().getAll();
+        mScheduleDataList = AppDatabase.getInstance(getActivity()).scheduleDao().getAllByChannelId(currentStation.id);
 
         if (stationData!= null && stationData.lastSource > 0) {
             sourceIndex = stationData.lastSource;
@@ -128,6 +127,20 @@ public class PlaybackVideoFragment extends MyVideoSupportFragment {
         super.onStop();
     }
 
+    private ScheduleData getNextProgram(ScheduleData currentProgram)
+    {
+        Date nextTime = new Date();
+        nextTime.setTime(currentProgram.endTime.getTime() + 60000);
+        for (ScheduleData scheduleData : mScheduleDataList)
+        {
+            if (isTimeInBetween(nextTime, scheduleData.startTime, scheduleData.endTime))
+            {
+                return scheduleData;
+            }
+        }
+        return null;
+    }
+
     private ScheduleDisplayInfo getScheduleDisplayInfo()
     {
         ScheduleDisplayInfo scheduleDisplayInfo = new ScheduleDisplayInfo();
@@ -144,14 +157,15 @@ public class PlaybackVideoFragment extends MyVideoSupportFragment {
                 scheduleDisplayInfo.currentProgramTime = formatter.format(scheduleData.startTime);
                 scheduleDisplayInfo.currentProgramName = scheduleData.programName;
 
-                if (index >= mScheduleDataList.size())
+                ScheduleData nextScheduleData = getNextProgram(scheduleData);
+
+                if (nextScheduleData == null)
                 {
                     scheduleDisplayInfo.nextProgramName = "";
                     scheduleDisplayInfo.nextProgramTime = "";
                 }
                 else
                 {
-                    ScheduleData nextScheduleData  = mScheduleDataList.get(index);
                     scheduleDisplayInfo.nextProgramTime = formatter.format(nextScheduleData.startTime);
                     scheduleDisplayInfo.nextProgramName = nextScheduleData.programName;
                 }
@@ -233,7 +247,7 @@ public class PlaybackVideoFragment extends MyVideoSupportFragment {
 
         mMediaPlayerGlue.setCurrentStation(currentStation);
 
-        mScheduleDataList = AppDatabase.getInstance(getActivity()).scheduleDao().getAllByChannelCodeToday(currentStation.code);
+        mScheduleDataList = AppDatabase.getInstance(getActivity()).scheduleDao().getAllByChannelId(currentStation.id);
         mMediaPlayerGlue.setScheduleInfo(getScheduleDisplayInfo());
 
         Log.d(TAG, "SwitchChanel: "+ currentStation.name);
@@ -267,7 +281,7 @@ public class PlaybackVideoFragment extends MyVideoSupportFragment {
         mMediaPlayerGlue.getPlayerAdapter().setDataSource(Uri.parse(currentStation.url.get(currentSourceIndex)));
 
         mMediaPlayerGlue.setCurrentStation(currentStation);
-        mScheduleDataList = AppDatabase.getInstance(getActivity()).scheduleDao().getAllByChannelCodeToday(currentStation.code);
+        mScheduleDataList = AppDatabase.getInstance(getActivity()).scheduleDao().getAllByChannelId(currentStation.id);
         mMediaPlayerGlue.setScheduleInfo(getScheduleDisplayInfo());
 
         Log.d(TAG, "SwitchChanelById: "+ currentStation.name);
