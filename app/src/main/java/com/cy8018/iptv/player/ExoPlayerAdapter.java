@@ -262,10 +262,10 @@ public class ExoPlayerAdapter extends PlayerAdapter implements ExoPlayer.EventLi
                 return new DashMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
             case C.TYPE_SS:
                 return new SsMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
-            case C.TYPE_HLS:
-                return new HlsMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
+//            case C.TYPE_HLS:
+//                return new HlsMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
             default:
-                return new ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
+                return new HlsMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
         }
     }
 

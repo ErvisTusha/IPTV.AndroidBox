@@ -61,7 +61,7 @@ public class PlaybackVideoFragment extends MyVideoSupportFragment {
 
     public static final int MSG_SWITCH_CHANNEL = 2;
 
-    public static final float CONTROL_OVERLAY_FADE_TIME = 4.5f;
+    public static final float CONTROL_OVERLAY_FADE_TIME = 5.5f;
 
     public static final float SWITCH_CHANNEL_DELAY_TIME = 1.0f;
 
