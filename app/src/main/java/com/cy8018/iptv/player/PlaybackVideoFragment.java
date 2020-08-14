@@ -99,7 +99,6 @@ public class PlaybackVideoFragment extends MyVideoSupportFragment {
         int sourceIndex = 0;
         StationData stationData = AppDatabase.getInstance(getActivity()).stationDao().findByName(currentStation.name);
 
-        //mScheduleDataList = AppDatabase.getInstance(getActivity()).scheduleDao().getAll();
         mScheduleDataList = AppDatabase.getInstance(getActivity()).scheduleDao().getAllByChannelId(currentStation.id);
 
         if (stationData!= null && stationData.lastSource > 0) {
@@ -341,7 +340,11 @@ public class PlaybackVideoFragment extends MyVideoSupportFragment {
     }
 
     public void ShowControl() {
-        showControlsOverlay(true);
+        if (!isControlsOverlayVisible())
+        {
+            mMediaPlayerGlue.setScheduleInfo(getScheduleDisplayInfo());
+            showControlsOverlay(true);
+        }
         SetLastActiveTime();
     }
 
