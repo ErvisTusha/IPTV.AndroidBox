@@ -391,6 +391,7 @@ public class PlaybackVideoFragment extends MyVideoSupportFragment {
             if (msg.what == MSG_SHOW_CONTROL) {
                 if (!playbackVideoFragment.isControlsOverlayVisible())
                 {
+                    playbackVideoFragment.mMediaPlayerGlue.setScheduleInfo(playbackVideoFragment.getScheduleDisplayInfo());
                     playbackVideoFragment.showControlsOverlay(true);
                 }
             }
