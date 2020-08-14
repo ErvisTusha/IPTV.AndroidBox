@@ -92,7 +92,7 @@ public class TvChannelsFragment extends VerticalGridSupportFragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setTitle(getResources().getString(R.string.channel_list_title));
+        setTitle(getResources().getString(R.string.app_name));
         setupRowAdapter();
     }
 

@@ -5,4 +5,6 @@ public class ScheduleDisplayInfo {
     public String currentProgramName;
     public String nextProgramTime;
     public String nextProgramName;
+    public String thirdProgramTime;
+    public String thirdProgramName;
 }

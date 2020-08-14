@@ -158,7 +158,6 @@ public class PlaybackVideoFragment extends MyVideoSupportFragment {
                 scheduleDisplayInfo.currentProgramName = scheduleData.programName;
 
                 ScheduleData nextScheduleData = getNextProgram(scheduleData);
-
                 if (nextScheduleData == null)
                 {
                     scheduleDisplayInfo.nextProgramName = "";
@@ -168,6 +167,18 @@ public class PlaybackVideoFragment extends MyVideoSupportFragment {
                 {
                     scheduleDisplayInfo.nextProgramTime = formatter.format(nextScheduleData.startTime);
                     scheduleDisplayInfo.nextProgramName = nextScheduleData.programName;
+                }
+
+                ScheduleData thirdScheduleData = getNextProgram(nextScheduleData);
+                if (thirdScheduleData == null)
+                {
+                    scheduleDisplayInfo.thirdProgramName = "";
+                    scheduleDisplayInfo.thirdProgramTime = "";
+                }
+                else
+                {
+                    scheduleDisplayInfo.thirdProgramTime = formatter.format(thirdScheduleData.startTime);
+                    scheduleDisplayInfo.thirdProgramName = thirdScheduleData.programName;
                 }
                 break;
             }

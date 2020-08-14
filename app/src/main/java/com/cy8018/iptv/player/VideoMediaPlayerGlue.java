@@ -244,6 +244,8 @@ public class VideoMediaPlayerGlue<T extends PlayerAdapter> extends PlaybackTrans
             TextView currentProgramTime;
             TextView nextProgramName;
             TextView nextProgramTime;
+            TextView thirdProgramName;
+            TextView thirdProgramTime;
             LinearLayout scheduleInfoBar;
             ImageView logo;
 
@@ -260,12 +262,15 @@ public class VideoMediaPlayerGlue<T extends PlayerAdapter> extends PlaybackTrans
                 currentProgramTime = itemView.findViewById(R.id.current_program_time);
                 nextProgramName = itemView.findViewById(R.id.next_program_name);
                 nextProgramTime = itemView.findViewById(R.id.next_program_time);
+                thirdProgramName = itemView.findViewById(R.id.third_program_name);
+                thirdProgramTime = itemView.findViewById(R.id.third_program_time);
                 scheduleInfoBar = itemView.findViewById(R.id.schedule_info);
 
                 logo = itemView.findViewById(R.id.channel_logo);
 
                 currentProgramName.setSelected(true);
                 nextProgramName.setSelected(true);
+                thirdProgramName.setSelected(true);
                 channelName.setSelected(true);
 
                 new Thread(updateInfoRunnable).start();
@@ -290,6 +295,14 @@ public class VideoMediaPlayerGlue<T extends PlayerAdapter> extends PlaybackTrans
                 if (nextProgramTime.getText() != getScheduleDisplayInfo().nextProgramTime)
                 {
                     nextProgramTime.setText(getScheduleDisplayInfo().nextProgramTime);
+                }
+                if (thirdProgramName.getText() != getScheduleDisplayInfo().thirdProgramName)
+                {
+                    thirdProgramName.setText(getScheduleDisplayInfo().thirdProgramName);
+                }
+                if (thirdProgramTime.getText() != getScheduleDisplayInfo().thirdProgramTime)
+                {
+                    thirdProgramTime.setText(getScheduleDisplayInfo().thirdProgramTime);
                 }
 
                 if (getScheduleDisplayInfo() == null
