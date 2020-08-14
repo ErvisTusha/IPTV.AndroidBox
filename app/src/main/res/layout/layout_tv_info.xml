@@ -6,59 +6,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     >
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_weight="10"
-        >
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="100dp"
-            android:textSize="40sp"
-            android:layout_weight="8"
-            />
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingEnd="30dp"
-            android:orientation="vertical">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/current_time"
-                android:textColor="#FFFFFF"
-                android:textSize="40sp"
-                android:layout_gravity="end|top"
-                android:gravity="end|top"
-                android:shadowColor="#000000"
-                android:shadowDx="3"
-                android:shadowDy="3"
-                android:shadowRadius="5"
-                />
-            <TextView
-                android:id="@+id/network_speed"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end|top"
-                android:gravity="end|top"
-                android:textColor="#FFFFFF"
-                android:textSize="28sp"
-                android:shadowColor="#000000"
-                android:shadowDx="3"
-                android:shadowDy="3"
-                android:shadowRadius="5"
-                android:paddingEnd="2dp"
-                />
-        </LinearLayout>
-
-    </LinearLayout>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:height="470dp"
         android:id="@+id/target_channel_id"
-        android:textSize="120sp"
+        android:textSize="150sp"
+        android:layout_margin="50dp"
         android:layout_gravity="center"
         android:gravity="center"
         android:layout_weight="1"
@@ -71,17 +24,20 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_weight="10"
         android:orientation="horizontal"
         android:background="@drawable/round_corner_bg"
         android:id="@+id/tv_info_bar"
         android:layout_marginLeft="25dp"
         android:layout_marginRight="25dp"
         android:paddingStart="5dp"
-        android:paddingEnd="10dp"
+        android:paddingEnd="5dp"
         >
         <LinearLayout
-            android:layout_width="100dp"
-            android:layout_height="112dp"
+            android:layout_weight="3.5"
+            android:layout_width="0dp"
+            android:layout_height="160dp"
+            android:gravity="start|bottom"
             android:orientation="vertical">
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -91,92 +47,95 @@
                 android:background="@drawable/round_corner_bg"
                 android:layout_marginStart="2dp"
                 android:layout_marginEnd="2dp"
-                android:paddingStart="5dp"
+                android:paddingStart="15dp"
                 android:paddingEnd="5dp"
                 android:paddingBottom="3dp"
-                android:layout_gravity="center"
+                android:layout_gravity="start"
                 android:gravity="center">
+                <LinearLayout
+                    android:layout_width="330dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingStart="10dp"
+                        android:layout_gravity="center"
+                        android:gravity="center">
 
-                <TextView
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/channel_id"
-                    android:textSize="65sp"
-                    android:textColor="@color/search_opaque"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:shadowColor="#000000"
-                    android:shadowDx="3"
-                    android:shadowDy="3"
-                    android:shadowRadius="5"
-                    android:layout_marginTop="-6dp"
-                    />
-                <TextView
-                    android:id="@+id/source_info"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:layout_marginTop="-10dp"
-                    android:padding="2dp"
-                    android:textColor="#FFFFFF"
-                    android:textSize="20sp"
-                    android:shadowColor="#000000"
-                    android:shadowDx="3"
-                    android:shadowDy="3"
-                    android:shadowRadius="3"
-                    />
+                        <TextView
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/channel_id"
+                            android:textSize="80sp"
+                            android:textColor="@color/search_opaque"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:shadowColor="#000000"
+                            android:shadowDx="3"
+                            android:shadowDy="3"
+                            android:shadowRadius="5"
+                            android:layout_marginTop="-6dp"
+                            />
+                        <TextView
+                            android:id="@+id/source_info"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:layout_marginTop="-10dp"
+                            android:padding="2dp"
+                            android:textColor="#FFFFFF"
+                            android:textSize="25sp"
+                            android:shadowColor="#000000"
+                            android:shadowDx="3"
+                            android:shadowDy="3"
+                            android:shadowRadius="3"
+                            />
+
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="210dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/channel_logo"
+                            android:layout_margin="2dp"
+                            android:layout_width="200dp"
+                            android:layout_height="80dp"
+                            android:layout_gravity="center"
+                            android:padding="5dp"
+                            />
+                        <TextView
+                            android:id="@+id/channel_name"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:textColor="#FFFFFF"
+                            android:textSize="40sp"
+                            android:layout_marginTop="-7dp"
+                            android:shadowColor="#000000"
+                            android:shadowDx="3"
+                            android:shadowDy="3"
+                            android:shadowRadius="5"
+                            android:ellipsize="marquee"
+                            android:marqueeRepeatLimit="marquee_forever"
+                            android:singleLine="true"
+                            />
+                    </LinearLayout>
+                </LinearLayout>
             </LinearLayout>
-
-
         </LinearLayout>
         <LinearLayout
-            android:layout_width="210dp"
+            android:layout_weight="4"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <ImageView
-                android:id="@+id/channel_logo"
-                android:layout_margin="2dp"
-                android:layout_width="200dp"
-                android:layout_height="100dp"
-                android:layout_gravity="center"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="500dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:orientation="vertical"
-            >
-            <TextView
-                android:id="@+id/channel_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="start"
-                android:textColor="#FFFFFF"
-                android:textSize="80sp"
-                android:shadowColor="#000000"
-                android:shadowDx="3"
-                android:shadowDy="3"
-                android:shadowRadius="5"
-                android:ellipsize="marquee"
-                android:marqueeRepeatLimit="marquee_forever"
-                android:singleLine="true"
-                />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="500dp"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_gravity="center_vertical|end"
-            android:gravity="center_vertical">
-
+            android:orientation="horizontal"
+            android:layout_gravity="bottom|center"
+            android:gravity="bottom|center">
             <LinearLayout
                 android:id="@+id/schedule_info"
                 android:layout_width="match_parent"
@@ -204,6 +163,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="end|center_vertical"
                         android:gravity="end"
+                        android:paddingEnd="2dp"
                         android:layout_marginEnd="10dp"
                         android:textColor="#FFFFFF"
                         android:textSize="28sp"
@@ -220,6 +180,7 @@
                         android:gravity="start"
                         android:textColor="#FFFFFF"
                         android:textSize="28sp"
+                        android:paddingEnd="2dp"
                         android:shadowColor="#000000"
                         android:shadowDx="3"
                         android:shadowDy="3"
@@ -254,6 +215,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="end|center_vertical"
                         android:gravity="center"
+                        android:paddingEnd="2dp"
                         android:layout_marginEnd="10dp"
                         android:textColor="#FFFFFF"
                         android:textSize="28sp"
@@ -264,12 +226,13 @@
                         />
                     <TextView
                         android:id="@+id/next_program_name"
-                        android:layout_width="300dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="start|center_vertical"
                         android:gravity="start"
                         android:textColor="#FFFFFF"
                         android:textSize="28sp"
+                        android:paddingEnd="2dp"
                         android:shadowColor="#000000"
                         android:shadowDx="3"
                         android:shadowDy="3"
@@ -281,6 +244,50 @@
                         android:singleLine="true"
                         />
                 </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_weight="2.5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="bottom|end"
+            android:gravity="bottom|end">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingEnd="2dp"
+                android:layout_gravity="center_vertical|end"
+                android:gravity="center_vertical|end"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/current_time"
+                    android:textColor="#FFFFFF"
+                    android:textSize="28sp"
+                    android:layout_gravity="end"
+                    android:gravity="end"
+                    android:shadowColor="#000000"
+                    android:shadowDx="3"
+                    android:shadowDy="3"
+                    android:shadowRadius="5"
+                    android:paddingEnd="2dp"
+                    />
+                <TextView
+                    android:id="@+id/network_speed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:gravity="end"
+                    android:textColor="#FFFFFF"
+                    android:textSize="28sp"
+                    android:shadowColor="#000000"
+                    android:shadowDx="3"
+                    android:shadowDy="3"
+                    android:shadowRadius="5"
+                    android:paddingEnd="2dp"
+                    />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
