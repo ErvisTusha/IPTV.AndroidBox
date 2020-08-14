@@ -385,7 +385,7 @@ public class PlaybackVideoFragment extends MyVideoSupportFragment {
             }
             else if (msg.what == MSG_HIDE_CONTROL) {
                 if (playbackVideoFragment.isControlsOverlayVisible() && playbackVideoFragment.mMediaPlayerGlue.isPlaying()) {
-                    playbackVideoFragment.hideControlsOverlay(false);
+                    playbackVideoFragment.hideControlsOverlay(true);
                 }
             }
             else if (msg.what == MSG_SWITCH_CHANNEL) {

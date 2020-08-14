@@ -130,7 +130,7 @@
             </LinearLayout>
         </LinearLayout>
         <LinearLayout
-            android:layout_weight="4"
+            android:layout_weight="4.5"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -174,7 +174,7 @@
                         />
                     <TextView
                         android:id="@+id/current_program_name"
-                        android:layout_width="300dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="start|center_vertical"
                         android:gravity="start"
@@ -247,7 +247,7 @@
             </LinearLayout>
         </LinearLayout>
         <LinearLayout
-            android:layout_weight="2.5"
+            android:layout_weight="2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="horizontal"

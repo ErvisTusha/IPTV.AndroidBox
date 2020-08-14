@@ -61,6 +61,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -328,10 +329,7 @@ public class TvChannelsFragment extends VerticalGridSupportFragment implements
         }
 
         for (ScheduleInfoParser.Program entry : entries) {
-
-            Log.d(TAG, "Program entry: " + entry.channelId + " " + entry.title + " " + entry.startTime + " " + entry.endTime);
-
-            if (channelIds.contains(entry.channelId))
+            if (channelIds.contains(entry.channelId) && isTimeWithin2Days(Objects.requireNonNull(getDate(entry.startTime))))
             {
                 ScheduleData schedule = new ScheduleData();
                 schedule.channelId = entry.channelId;
@@ -339,11 +337,9 @@ public class TvChannelsFragment extends VerticalGridSupportFragment implements
                 schedule.startTime = getDate(entry.startTime);
                 schedule.endTime = getDate(entry.endTime);
 
+                Log.d(TAG, "Add program: " + entry.channelId + " " + entry.title + " " + entry.startTime + " " + entry.endTime);
                 AppDatabase.getInstance(getActivity()).scheduleDao().insert(schedule);
             }
-
-
-
         }
         return "";
     }
@@ -359,5 +355,19 @@ public class TvChannelsFragment extends VerticalGridSupportFragment implements
         // Starts the query
         conn.connect();
         return conn.getInputStream();
+    }
+
+    private boolean isTimeWithin2Days(Date time) {
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.DATE, 2);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+
+        Date targetTime = calendar.getTime();
+
+        return time.getTime() < targetTime.getTime();
     }
 }
