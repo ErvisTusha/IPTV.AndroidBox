@@ -67,6 +67,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Example fragment displaying videos in a vertical grid using {@link VerticalGridSupportFragment}.
@@ -313,6 +314,10 @@ public class TvChannelsFragment extends VerticalGridSupportFragment implements
         List<ScheduleInfoParser.Program> entries = null;
         try {
             stream = downloadUrl(urlString);
+            if (urlString.endsWith(".gz"))
+            {
+                stream = new GZIPInputStream(stream);
+            }
             entries = scheduleInfoParser.parse(stream);
             // Makes sure that the InputStream is closed after the app is
             // finished using it.
