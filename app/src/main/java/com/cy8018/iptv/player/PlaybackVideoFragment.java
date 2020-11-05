@@ -83,36 +83,29 @@ public class PlaybackVideoFragment extends MyVideoSupportFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //setBackgroundType(BG_LIGHT);
-
-        setBackgroundType(BG_NONE);
-        ExoPlayerAdapter playerAdapter = new ExoPlayerAdapter(getActivity());
-        mMediaPlayerGlue = new VideoMediaPlayerGlue(getActivity(), playerAdapter);
-        mMediaPlayerGlue.setHost(mHost);
-
-        mMediaPlayerGlue.setSeekEnabled(false);
-        mMediaPlayerGlue.setControlsOverlayAutoHideEnabled(true);
-
         mStationList = getActivity().getIntent().getParcelableArrayListExtra("stationList");
         currentStation = getActivity().getIntent().getParcelableExtra("currentStation");
-
         int sourceIndex = 0;
         StationData stationData = AppDatabase.getInstance(getActivity()).stationDao().findByName(currentStation.name);
-
         mScheduleDataList = AppDatabase.getInstance(getActivity()).scheduleDao().getAllByChannelId(currentStation.id);
 
         if (stationData!= null && stationData.lastSource > 0) {
             sourceIndex = stationData.lastSource;
         }
 
+        //setBackgroundType(BG_LIGHT);
+        setBackgroundType(BG_NONE);
+        ExoPlayerAdapter playerAdapter = new ExoPlayerAdapter(getActivity());
+        mMediaPlayerGlue = new VideoMediaPlayerGlue(getActivity(), playerAdapter);
+        mMediaPlayerGlue.setHost(mHost);
+        mMediaPlayerGlue.setSeekEnabled(false);
+        mMediaPlayerGlue.setControlsOverlayAutoHideEnabled(true);
+        mMediaPlayerGlue.setStationList(mStationList);
+        mMediaPlayerGlue.setCurrentStation(currentStation);
         mMediaPlayerGlue.setTitle(currentStation.name);
         mMediaPlayerGlue.setSubtitle(sourceIndex + 1 +"/" + currentStation.url.size());
         mMediaPlayerGlue.getPlayerAdapter().setDataSource(Uri.parse(currentStation.url.get(sourceIndex)));
-
-        mMediaPlayerGlue.setCurrentStation(currentStation);
-
         mMediaPlayerGlue.setScheduleInfo(getScheduleDisplayInfo());
-
         mMediaPlayerGlue.playWhenPrepared();
 
         SetLastActiveTime();
@@ -268,7 +261,7 @@ public class PlaybackVideoFragment extends MyVideoSupportFragment {
     public void SwitchChannelById(String channelId) {
         int index = Integer.parseInt(channelId) - 1;
 
-        if (index < 0 || index > mStationList.size())
+        if (index < 0 || index >= mStationList.size())
         {
             Log.d(TAG, "SwitchChannelById index error, index: " + index);
             return;

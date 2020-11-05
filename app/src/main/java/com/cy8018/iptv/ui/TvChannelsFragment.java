@@ -328,7 +328,6 @@ public class TvChannelsFragment extends VerticalGridSupportFragment implements
         }
 
         List<String> channelIds = new ArrayList<String>();
-
         for (Station station : mStationList) {
             channelIds.add(station.id);
         }
@@ -342,7 +341,7 @@ public class TvChannelsFragment extends VerticalGridSupportFragment implements
                 schedule.startTime = getDate(entry.startTime);
                 schedule.endTime = getDate(entry.endTime);
 
-                Log.d(TAG, "Add program: " + entry.channelId + " " + entry.title + " " + entry.startTime + " " + entry.endTime);
+                //Log.d(TAG, "Add program: " + entry.channelId + " " + entry.title + " " + entry.startTime + " " + entry.endTime);
                 AppDatabase.getInstance(getActivity()).scheduleDao().insert(schedule);
             }
         }
