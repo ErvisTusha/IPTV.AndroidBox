@@ -14,11 +14,13 @@
 
 package com.cy8018.iptv.player;
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.leanback.media.PlaybackGlue;
 
@@ -37,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Handles video playback with media controls.
@@ -200,19 +203,28 @@ public class PlaybackVideoFragment extends MyVideoSupportFragment {
         }
     }
 
-    static void playWhenReady(VideoMediaPlayerGlue glue) {
-        if (glue.isPrepared()) {
-            glue.play();
-        } else {
-            glue.addPlayerCallback(new VideoMediaPlayerGlue.PlayerCallback() {
-                @Override
-                public void onPreparedStateChanged(PlaybackGlue glue) {
-                    if (glue.isPrepared()) {
-                        glue.removePlayerCallback(this);
-                        glue.play();
+    public void showToastMsg(String msg) {
+        Toast toast = Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), msg, Toast.LENGTH_SHORT);
+        toast.show();
+    }
+
+    public void playWhenReady(VideoMediaPlayerGlue glue) {
+        try {
+            if (glue.isPrepared()) {
+                glue.play();
+            } else {
+                glue.addPlayerCallback(new VideoMediaPlayerGlue.PlayerCallback() {
+                    @Override
+                    public void onPreparedStateChanged(PlaybackGlue glue) {
+                        if (glue.isPrepared()) {
+                            glue.removePlayerCallback(this);
+                            glue.play();
+                        }
                     }
-                }
-            });
+                });
+            }
+        } catch (Exception e) {
+            showToastMsg(e.getMessage());
         }
     }
 
