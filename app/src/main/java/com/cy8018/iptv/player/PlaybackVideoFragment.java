@@ -138,47 +138,52 @@ public class PlaybackVideoFragment extends MyVideoSupportFragment {
 
     private ScheduleDisplayInfo getScheduleDisplayInfo()
     {
-        ScheduleDisplayInfo scheduleDisplayInfo = new ScheduleDisplayInfo();
+        try {
+            ScheduleDisplayInfo scheduleDisplayInfo = new ScheduleDisplayInfo();
 
-        Date nowTime = new Date();
-        int index = 0;
-        for (ScheduleData scheduleData : mScheduleDataList)
-        {
-            index++;
-            if (isTimeInBetween(nowTime, scheduleData.startTime, scheduleData.endTime))
+            Date nowTime = new Date();
+            int index = 0;
+            for (ScheduleData scheduleData : mScheduleDataList)
             {
-                Format formatter = new SimpleDateFormat("HH:mm");
+                index++;
+                if (isTimeInBetween(nowTime, scheduleData.startTime, scheduleData.endTime))
+                {
+                    Format formatter = new SimpleDateFormat("HH:mm");
 
-                scheduleDisplayInfo.currentProgramTime = formatter.format(scheduleData.startTime);
-                scheduleDisplayInfo.currentProgramName = scheduleData.programName;
+                    scheduleDisplayInfo.currentProgramTime = formatter.format(scheduleData.startTime);
+                    scheduleDisplayInfo.currentProgramName = scheduleData.programName;
 
-                ScheduleData nextScheduleData = getNextProgram(scheduleData);
-                if (nextScheduleData == null)
-                {
-                    scheduleDisplayInfo.nextProgramName = "";
-                    scheduleDisplayInfo.nextProgramTime = "";
-                }
-                else
-                {
-                    scheduleDisplayInfo.nextProgramTime = formatter.format(nextScheduleData.startTime);
-                    scheduleDisplayInfo.nextProgramName = nextScheduleData.programName;
-                }
+                    ScheduleData nextScheduleData = getNextProgram(scheduleData);
+                    if (nextScheduleData == null)
+                    {
+                        scheduleDisplayInfo.nextProgramName = "";
+                        scheduleDisplayInfo.nextProgramTime = "";
+                    }
+                    else
+                    {
+                        scheduleDisplayInfo.nextProgramTime = formatter.format(nextScheduleData.startTime);
+                        scheduleDisplayInfo.nextProgramName = nextScheduleData.programName;
+                    }
 
-                ScheduleData thirdScheduleData = getNextProgram(nextScheduleData);
-                if (thirdScheduleData == null)
-                {
-                    scheduleDisplayInfo.thirdProgramName = "";
-                    scheduleDisplayInfo.thirdProgramTime = "";
+                    ScheduleData thirdScheduleData = getNextProgram(nextScheduleData);
+                    if (thirdScheduleData == null)
+                    {
+                        scheduleDisplayInfo.thirdProgramName = "";
+                        scheduleDisplayInfo.thirdProgramTime = "";
+                    }
+                    else
+                    {
+                        scheduleDisplayInfo.thirdProgramTime = formatter.format(thirdScheduleData.startTime);
+                        scheduleDisplayInfo.thirdProgramName = thirdScheduleData.programName;
+                    }
+                    break;
                 }
-                else
-                {
-                    scheduleDisplayInfo.thirdProgramTime = formatter.format(thirdScheduleData.startTime);
-                    scheduleDisplayInfo.thirdProgramName = thirdScheduleData.programName;
-                }
-                break;
             }
+            return scheduleDisplayInfo;
         }
-        return scheduleDisplayInfo;
+        catch (Exception e) {
+            return null;
+        }
     }
 
     private boolean isTimeInBetween(Date nowTime, Date startTime, Date endTime) {
