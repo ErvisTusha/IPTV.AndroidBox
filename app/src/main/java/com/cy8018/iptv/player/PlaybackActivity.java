@@ -117,12 +117,12 @@ public class PlaybackActivity extends FragmentActivity {
 
         if (event.getAction() == KeyEvent.ACTION_DOWN
                 &&  (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP || event.getKeyCode() == KeyEvent.KEYCODE_CHANNEL_UP)) {
-            mFragment.SwitchChannel(true);
+            mFragment.SwitchChannel(false);
             return true;
         }
         if (event.getAction() == KeyEvent.ACTION_DOWN
                 && (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN || event.getKeyCode() == KeyEvent.KEYCODE_CHANNEL_DOWN)) {
-            mFragment.SwitchChannel(false);
+            mFragment.SwitchChannel(true);
             return true;
         }
         if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_DPAD_LEFT) {
